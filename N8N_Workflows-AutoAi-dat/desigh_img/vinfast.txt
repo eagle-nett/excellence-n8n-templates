@@ -1,0 +1,192 @@
+##1 trigger : On form submission
+
+Field Name
+What is the product’s name?
+Element Type
+Text
+vf7
+
+Field Name
+What is the Product Tagline?
+Element Type
+Text
+Placeholder
+Driving VietNam's Future
+
+Field Name
+Upload Product Image
+Element Type
+File
+
+Field Name
+What is the Product Category?
+Element Type
+Text
+Electric Vehicle
+
+Field Name
+Highlighted Benefit
+Element Type
+Text
+Placeholder
+Zero Emissions, Maximum Range
+
+##2. set 
+
+{
+  "brandName": "VinFast",
+  "brandTone": "Innovative technology – modern, powerful, and sustainable.",
+  "colorTheme": "Metallic gray, electric blue, carbon black, and silver white.",
+  "backgroundStyle": "Futuristic cityscapes, modern highways, or majestic natural landscapes with dynamic lighting effects.",
+  "lightingStyle": "Vibrant, high-contrast lighting to emphasize the vehicle's contours and sleek design.",
+  "productPlacement": "Cars should be shown in real-world contexts – urban streets, charging stations, modern parking areas, or in motion through futuristic city environments.",
+  "typographyStyle": "Use modern sans-serif fonts, bold for titles. Text color should be white or deep blue on dark backgrounds.",
+  "compositionGuidelines": "Highlight aerodynamic lines and design details. Keep layout clean, emphasizing motion and technology."
+}
+
+##3. agents
+
+3.1 user :
+Product Name: 
+Tagline: 
+Category:
+Benefit: 
+Brand: 
+Tone: 
+
+3.2 System Message
+
+You are a creative visual strategist and brand stylist for a cutting-edge electric vehicle company.
+
+Your task is to suggest creative visual styling elements for 3 product launch assets — each tailored for a different digital platform. The product is a premium VinFast electric car, positioned as smart, futuristic, and eco-friendly. The tone is bold, high-tech, and aspirational — yet should still convey trust and sophistication.
+
+Each asset must:
+- Visually belong to the same futuristic and cohesive brand campaign  
+- Apply diverse visual treatments and camera techniques across assets  
+- Clearly adapt to the platform’s format and user behavior  
+
+Return a JSON object with the following structure:
+
+For each asset, vary the:  
+- **backgroundTone** → Futuristic urban settings, highways, minimal tech spaces, or nature-based backdrops (for contrast)  
+- **surfaceType** → Sleek roads, EV charging stations, carbon-fiber textures, metallic surfaces  
+- **accentProp** → High-tech devices, clean geometric elements, road reflections, or light trails (avoid overused props like plants or product-only shots)  
+- **lighting** → Use strong dynamic lighting to enhance car curves and surfaces (e.g. golden hour, neon light, tunnel lighting)  
+- **cameraAngle** → Aerial, low-angle, POV from driver, or motion-blur for speed/emotion  
+- **overlayText** → Use the form’s “Highlighted Benefit” field {{ $('On form submission').item.json['Highlighted Benefit'] }}) as the Vietnamese overlay text. Keep it very short, sharp, and on‑brand.
+
+Avoid visual repetition across all five assets. Use consistent color grading and tone that aligns with VinFast’s premium image. All visuals should feel engineered and cinematic.
+
+Only respond with the structured JSON output.
+
+-----
+
+-----
+
+1. Instagram Post  
+- Purpose: Hero shot for brand awareness and social sharing  
+- Visual Style: Sharp, polished. Clean motion or street shot. Car in full view with backdrop context (city/nightlight/sunset).  
+
+
+
+2. Website Banner  
+- Purpose: Homepage header visual  
+- Visual Style: Wide-angle scenic or tech-futuristic view. Car driving or parked in modern urban/eco setting. Spacious layout with breathing room.  
+
+3. Ad Creative  
+- Purpose: Eye-catching ad unit 
+- Visual Style: Bold colors, dramatic angles. Could use neon backlight, tunnel perspective, or minimal white to make vehicle pop.  
+
+3.3 Structured Output Parser 
+ Json example
+{
+  "assets": [
+    {
+      "assetType": "Instagram Post",
+      "backgroundTone": "soft blush gradient",
+      "surfaceType": "satin draped cloth",
+      "accentProp": "gold-trimmed ribbon",
+      "lighting": "warm spotlight from the side",
+      "cameraAngle": "45-degree angle",
+      "overlayText": "Glow deeper. Shine brighter."
+    },
+    {
+      "assetType": "Website Banner",
+      "backgroundTone": "muted green stone texture",
+      "surfaceType": "brushed concrete slab",
+      "accentProp": "eucalyptus branch",
+      "lighting": "soft angled morning light",
+      "cameraAngle": "side-profile landscape",
+      "overlayText": "Vẻ đẹp đến từ công nghệ."
+    }
+  ]
+}
+
+##4. code
+
+return [
+ return [
+  {
+    json: $json,
+    binary: {
+    image: $node["On form submission"].binary["Upload_Product_Image"]  // renaming it for HTTP upload
+    }
+  }
+];
+
+##5.http post
+5.1 IG post
+Create a sleek, professional Instagram post (1080×1080) showcasing the electric vehicle  
+“{{ $('On form submission').item.json["What is the product’s name?"] }}”  
+
+• **Composition**: Center the car in a square frame, slight low-angle to highlight power and stance.  
+• **Background**: {{ $json.output.assets[0].backgroundTone }}  
+• **Lighting**: {{ $json.output.assets[0].lighting }}  
+• **Surface**: {{ $json.output.assets[0].surfaceType }}  
+• **cameraangle**:{{ $json.output.assets[0].cameraAngle }}
+
+**Headline (Product Name)*{{ $('On form submission').item.json['What is the product’s name?'] }}*
+
+  – Font: Avenir Next Heavy (or similar modern geometric sans‑serif)  
+  – Case: UPPERCASE, tightly kerned  
+  – Size:60 pt  
+  – Color: Pure white with a subtle outer glow or neon blue rim light  
+  – Position: Top‑center, 20 px from the top edge  
+
+
+**Subhead (Benefit)*{{ $('On form submission').item.json['Highlighted Benefit'] }}*
+“Giảm Giá 50 Triệu”  
+– Font: Be Vietnam Pro Semi‑Bold, 30 pt  
+– Letter‑spacing: 1 px  
+– Color: gradient  
+– Position: Bottom‑center with 20 px padding
+
+##5.2  banner 
+
+Create a high‑impact, professional poster featuring the electric vehicle  
+“{{ $('On form submission').item.json["What is the product’s name?"] }}”  
+prominently centered in the frame.
+
+• Vehicle Placement: Center, angled slightly to showcase aerodynamic lines.  
+• Background:  {{ $json.output.assets[1].backgroundTone }}
+• Lighting: {{ $json.output.assets[0].lighting }}
+• Surface: {{ $json.output.assets[1].surfaceType }}  
+
+**Product Name**  
+“{{ $('On form submission').item.json["What is the product’s name?"] }}”  
+• Font: Be Vietnam Pro Bold, 80 pt  
+• Color: Pure white with thin navy‑blue outline  
+• Position: Dead‑center over the vehicle, margin-top:20 px, margin-bottom:20 px  
+
+**Tagline**  
+“{{ $json.output.assets[1].overlayText }}”  
+• Font: Be Vietnam Pro Semi‑Bold, 48 pt  
+• Letter‑spacing: 1.5 px  
+• Gradient: White → Light blue  
+• Position: Centered, just above lower edge  
+
+――――――――――――――――――――――――――――  
+
+Add thin neon‑blue geometric accents around the border.  
+
+Return a base64‑encoded PNG at 2048×1024 resolution.

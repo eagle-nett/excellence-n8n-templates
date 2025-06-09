@@ -1,0 +1,210 @@
+{
+  "name": "Auto Share driver copy",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "simple": false,
+        "filters": {
+          "q": "Chia sẻ một thư mục"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -480,
+        -260
+      ],
+      "id": "a1aedefd-2d1a-4cf5-9266-f1269cab6155",
+      "name": "Gmail Trigger",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "gdShmpYwIvkawVeD",
+          "name": "Gmail account hicuongnv"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "5d23f54b-4007-4a1f-9a89-95d00d6c6f4b",
+              "leftValue": "={{ $json.from.value[0].address }}",
+              "rightValue": "drive-shares-dm-noreply@google.com",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            },
+            {
+              "id": "7f4b2cb6-9ab5-4a12-bfb8-e5b05b120f90",
+              "leftValue": "={{ $json.subject }}",
+              "rightValue": "ChiaSe",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        100,
+        -280
+      ],
+      "id": "e3b2a113-ffda-448f-a904-7a169c08d842",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "operation": "share",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.driver_file_id }}",
+          "mode": "id"
+        },
+        "permissionsUi": {
+          "permissionsValues": {
+            "role": "reader",
+            "type": "user",
+            "emailAddress": "={{ $('Gmail Trigger').item.json.replyTo.value[0].address }}"
+          }
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        160,
+        -120
+      ],
+      "id": "2eb48a85-d7df-410c-ab85-4dd4377f399e",
+      "name": "Google Drive",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "NkOvCBNP3TQli8dE",
+          "name": "Google Drive account hicuongnv"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "-4203433635",
+        "text": "=Đã chia sẻ thư mục {{ $('Gmail Trigger').item.json.subject }} thành công  đến  {{ $('Gmail Trigger').item.json.replyTo.text }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        380,
+        -120
+      ],
+      "id": "28794e91-265c-41f6-941a-f45addfbe487",
+      "name": "Telegram",
+      "webhookId": "bf255a2e-0fad-45f4-b2df-750cf5bd7611",
+      "credentials": {
+        "telegramApi": {
+          "id": "PDODs6Ez14Yag9J6",
+          "name": "Telegram PhoAi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Add a new field called 'myNewField' to the JSON of the item\n\nlet pos = $input.item.json.text.indexOf('https://drive.google.com/file/d/');\nif(pos!=-1){\n  let pos1 = $input.item.json.text.indexOf('/view?usp=sharing', pos);\n  if(pos1 != -1){\n    $input.item.json.driver_file_id = $input.item.json.text.slice(pos, pos1).split('/').pop();\n  }\n}\nreturn $input.item;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -160,
+        -280
+      ],
+      "id": "c027442c-5768-4805-8331-ca8075ea1046",
+      "name": "Tách driverId"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "Tách driverId",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Google Drive",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive": {
+      "main": [
+        [
+          {
+            "node": "Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram": {
+      "main": [
+        []
+      ]
+    },
+    "Tách driverId": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "c3e34538-e585-42ce-a110-18e4f0ee4e4f",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "558d88703fb65b2d0e44613bc35916258b0f0bf983c5d4730c00c424b77ca36a"
+  },
+  "id": "buCZTtkJF4CDQ1Vt",
+  "tags": []
+}

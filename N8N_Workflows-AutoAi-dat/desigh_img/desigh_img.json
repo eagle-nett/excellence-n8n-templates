@@ -1,0 +1,707 @@
+{
+  "name": "desigh img",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "TRỢ LÝ CỦA ĐẠT",
+        "formDescription": "CHỌN DỮ LIỆU ĐI MẤY FEN",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "What is the product's name?",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "What is the product tagline?",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Upload product image",
+              "fieldType": "file",
+              "acceptFileTypes": ".jpg .png",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "What is the product category?",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Highlighted benefit",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        -1200,
+        -60
+      ],
+      "id": "8c2b6f73-8482-46ea-b83f-7e08404a6012",
+      "name": "On form submission",
+      "webhookId": "acc6fc57-2523-49b1-8d4f-d009d448de91"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "{\n  \"brandName\": \"VinFast\",\n  \"brandTone\": \"Innovative technology – modern, powerful, and sustainable.\",\n  \"colorTheme\": \"Metallic gray, electric blue, carbon black, and silver white.\",\n  \"backgroundStyle\": \"Futuristic cityscapes, modern highways, or majestic natural landscapes with dynamic lighting effects.\",\n  \"lightingStyle\": \"Vibrant, high-contrast lighting to emphasize the vehicle's contours and sleek design.\",\n  \"productPlacement\": \"Cars should be shown in real-world contexts – urban streets, charging stations, modern parking areas, or in motion through futuristic city environments.\",\n  \"typographyStyle\": \"Use modern sans-serif fonts, bold for titles. Text color should be white or deep blue on dark backgrounds.\",\n  \"compositionGuidelines\": \"Highlight aerodynamic lines and design details. Keep layout clean, emphasizing motion and technology.\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -980,
+        -60
+      ],
+      "id": "4f2ead21-9733-4f23-95a5-ca28c3eebbec",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "resource": "folder",
+        "name": "={{ $('On form submission').item.json['What is the product\\'s name?'] }}{{ $('On form submission').item.json['What is the product tagline?'] }}",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "1aFkEsxZskhplb_Qvf679ZvcXfMbWdMFo",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -760,
+        -60
+      ],
+      "id": "67796f5d-23df-4e5c-b2c5-dbb882610fb7",
+      "name": "Google Drive",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "5pSKcaFPHWg4krfR",
+          "name": "Google Drive account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Product Name: {{ $('On form submission').item.json['What is the product\\'s name?'] }}\nTagline: {{ $('On form submission').item.json['What is the product tagline?'] }}\nCategory:{{ $('On form submission').item.json['What is the product category?'] }}\nBenefit: {{ $('On form submission').item.json['Highlighted benefit'] }}\nBrand: {{ $('Edit Fields').item.json.brandName }}\nTone: {{ $('Edit Fields').item.json.brandTone }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=You are a creative visual strategist and brand stylist for a cutting-edge electric vehicle company.\n\nYour task is to suggest creative visual styling elements for 3 product launch assets — each tailored for a different digital platform. The product is a premium VinFast electric car, positioned as smart, futuristic, and eco-friendly. The tone is bold, high-tech, and aspirational — yet should still convey trust and sophistication.\n\nEach asset must:\n- Visually belong to the same futuristic and cohesive brand campaign  \n- Apply diverse visual treatments and camera techniques across assets  \n- Clearly adapt to the platform’s format and user behavior  \n\nReturn a JSON object with the following structure:\n\nFor each asset, vary the:  \n- **backgroundTone** → Futuristic urban settings, highways, minimal tech spaces, or nature-based backdrops (for contrast)  \n- **surfaceType** → Sleek roads, EV charging stations, carbon-fiber textures, metallic surfaces  \n- **accentProp** → High-tech devices, clean geometric elements, road reflections, or light trails (avoid overused props like plants or product-only shots)  \n- **lighting** → Use strong dynamic lighting to enhance car curves and surfaces (e.g. golden hour, neon light, tunnel lighting)  \n- **cameraAngle** → Aerial, low-angle, POV from driver, or motion-blur for speed/emotion  \n- **overlayText** → Use the form’s “Highlighted Benefit” field {{ $('On form submission').item.json['Highlighted benefit'] }}) as the Vietnamese overlay text. Keep it very short, sharp, and on‑brand.\n\nAvoid visual repetition across all five assets. Use consistent color grading and tone that aligns with VinFast’s premium image. All visuals should feel engineered and cinematic.\n\nOnly respond with the structured JSON output.\n\n-----\n\n-----\n\n1. Instagram Post  \n- Purpose: Hero shot for brand awareness and social sharing  \n- Visual Style: Sharp, polished. Clean motion or street shot. Car in full view with backdrop context (city/nightlight/sunset).  \n\n\n\n2. Website Banner  \n- Purpose: Homepage header visual  \n- Visual Style: Wide-angle scenic or tech-futuristic view. Car driving or parked in modern urban/eco setting. Spacious layout with breathing room.  \n\n3. Ad Creative  \n- Purpose: Eye-catching ad unit \n- Visual Style: Bold colors, dramatic angles. Could use neon backlight, tunnel perspective, or minimal white to make vehicle pop.  \n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.9,
+      "position": [
+        -1080,
+        220
+      ],
+      "id": "49fd7655-e810-479a-ad7a-46836cefbe39",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"assets\": [\n    {\n      \"assetType\": \"Instagram Post\",\n      \"backgroundTone\": \"soft blush gradient\",\n      \"surfaceType\": \"satin draped cloth\",\n      \"accentProp\": \"gold-trimmed ribbon\",\n      \"lighting\": \"warm spotlight from the side\",\n      \"cameraAngle\": \"45-degree angle\",\n      \"overlayText\": \"Glow deeper. Shine brighter.\"\n    },\n    {\n      \"assetType\": \"Website Banner\",\n      \"backgroundTone\": \"muted green stone texture\",\n      \"surfaceType\": \"brushed concrete slab\",\n      \"accentProp\": \"eucalyptus branch\",\n      \"lighting\": \"soft angled morning light\",\n      \"cameraAngle\": \"side-profile landscape\",\n      \"overlayText\": \"Vẻ đẹp đến từ công nghệ.\"\n    }\n  ]\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        -860,
+        460
+      ],
+      "id": "c97a63b3-493e-480a-b9a0-4eca430efcf4",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\n    json: $json,\n    binary: {\n    image: $node[\"On form submission\"].binary[\"Upload_product_image\"]  // renaming it for HTTP upload\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -640,
+        280
+      ],
+      "id": "1885e7c7-c10a-4aec-90f0-8587ed0d0a34",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "3795c070-c998-457d-938e-ab31b7f2fe42",
+                    "leftValue": "={{ $json.output.assets[0].assetType }}",
+                    "rightValue": "Instagram Post",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "3da10e93-2349-45cf-9c15-a35a4a3de22b",
+                    "leftValue": "={{ $json.output.assets[1].assetType }}",
+                    "rightValue": "Website Banner",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "fea69194-d73e-42cc-a126-135c718d9af2",
+                    "leftValue": "={{ $json.output.assets[2].assetType }}",
+                    "rightValue": "Ad Creative",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {
+          "allMatchingOutputs": true
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -480,
+        80
+      ],
+      "id": "97eaa33e-6ced-458a-a9c7-60cf2f0425e0",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/images/edits",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "model",
+              "value": "gpt-image-1"
+            },
+            {
+              "name": "prompt",
+              "value": "=Create a sleek, professional Instagram post (1080×1080) showcasing the electric vehicle  \n“{{ $('On form submission').item.json['What is the product\\'s name?'] }}”  \n\n• **Composition**: Center the car in a square frame, slight low-angle to highlight power and stance.  \n• **Background**: {{ $json.output.assets[0].backgroundTone }}  \n• **Lighting**: {{ $json.output.assets[0].lighting }}  \n• **Surface**: {{ $json.output.assets[0].surfaceType }}  \n• **cameraangle**:{{ $json.output.assets[0].cameraAngle }}\n\n**Headline (Product Name)*{{ $('On form submission').item.json['What is the product\\'s name?'] }}*\n\n  – Font: Avenir Next Heavy (or similar modern geometric sans‑serif)  \n  – Case: UPPERCASE, tightly kerned  \n  – Size:60 pt  \n  – Color: Pure white with a subtle outer glow or neon blue rim light  \n  – Position: Top‑center, 20 px from the top edge  \n\n\n**Subhead (Benefit)*{{ $('On form submission').item.json['Highlighted benefit'] }}*\n“Giảm Giá 50 Triệu”  \n– Font: Be Vietnam Pro Semi‑Bold, 30 pt  \n– Letter‑spacing: 1 px  \n– Color: gradient  \n– Position: Bottom‑center with 20 px padding\n"
+            },
+            {
+              "name": "output_format",
+              "value": "png"
+            },
+            {
+              "parameterType": "formBinaryData",
+              "name": "image",
+              "inputDataFieldName": "image"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -320,
+        -160
+      ],
+      "id": "6ac5d571-86e5-469c-9c7b-4ddc4e69e1af",
+      "name": "HTTP Request1",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "O8b19lTG6rf0phgW",
+          "name": "Header Auth account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "toBinary",
+        "sourceProperty": "data[0].b64_json",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        -120,
+        -80
+      ],
+      "id": "ca5c474e-fe5b-41e7-a8b0-f362207719bd",
+      "name": "Convert to File1"
+    },
+    {
+      "parameters": {
+        "name": "={{ $('Google Drive').item.json.id }}",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "={{ $('Google Drive').item.json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        80,
+        -160
+      ],
+      "id": "25af168f-e44d-42ec-a992-0e4953f674f1",
+      "name": "Google Drive2",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "5pSKcaFPHWg4krfR",
+          "name": "Google Drive account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "gpt-4o"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -1120,
+        460
+      ],
+      "id": "21ff708f-e0b6-410a-bf17-781e08e0df2b",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "rJkllg85vq3p28Qt",
+          "name": "vinfast"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/images/edits",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "model",
+              "value": "gpt-image-1"
+            },
+            {
+              "name": "prompt",
+              "value": "=Create a high‑impact, professional poster featuring the electric vehicle  \n“{{ $('On form submission').item.json['What is the product\\'s name?'] }}”  \nprominently centered in the frame.\n\n• Vehicle Placement: Center, angled slightly to showcase aerodynamic lines.  \n• Background:  {{ $json.output.assets[1].backgroundTone }}\n• Lighting: {{ $json.output.assets[1].lighting }}\n• Surface: {{ $json.output.assets[1].surfaceType }}  \n\n**Product Name**  \n“{{ $('On form submission').item.json['What is the product\\'s name?'] }}”  \n• Font: Be Vietnam Pro Bold, 80 pt  \n• Color: Pure white with thin navy‑blue outline  \n• Position: Dead‑center over the vehicle, margin-top:20 px, margin-bottom:20 px  \n\n**Tagline**  \n“{{ $json.output.assets[1].overlayText }}”  \n• Font: Be Vietnam Pro Semi‑Bold, 48 pt  \n• Letter‑spacing: 1.5 px  \n• Gradient: White → Light blue  \n• Position: Centered, just above lower edge  \n\n――――――――――――――――――――――――――――  \n\nAdd thin neon‑blue geometric accents around the border.  \n\nReturn a base64‑encoded PNG at 2048×1024 resolution.\n"
+            },
+            {
+              "name": "output_format",
+              "value": "png"
+            },
+            {
+              "parameterType": "formBinaryData",
+              "name": "image",
+              "inputDataFieldName": "image"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -220,
+        80
+      ],
+      "id": "6790d98f-dc77-4300-a5d2-fbf4346ed038",
+      "name": "HTTP Request",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "O8b19lTG6rf0phgW",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "toBinary",
+        "sourceProperty": "data[0].b64_json",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        -20,
+        160
+      ],
+      "id": "2a311800-c6b4-417d-9ada-9c89d044a8dd",
+      "name": "Convert to File"
+    },
+    {
+      "parameters": {
+        "name": "={{ $('Google Drive').item.json.id }}{{ $('Google Drive').item.json.name }}",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "={{ $('Google Drive').item.json.id }} ",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        180,
+        80
+      ],
+      "id": "863a779c-6a7a-40b9-b91d-5c384e8755d4",
+      "name": "Google Drive3",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "5pSKcaFPHWg4krfR",
+          "name": "Google Drive account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/images/edits",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "model",
+              "value": "gpt-image-1"
+            },
+            {
+              "name": "prompt",
+              "value": "=Create a sleek, professional Instagram post (1080×1080) showcasing the electric vehicle  \n“{{ $('On form submission').item.json['What is the product\\'s name?'] }}”  \n\n• **Composition**: Center the car in a square frame, slight low-angle to highlight power and stance.  \n• **Background**: {{ $json.output.assets[0].backgroundTone }}  \n• **Lighting**: {{ $json.output.assets[0].lighting }}  \n• **Surface**: {{ $json.output.assets[0].surfaceType }}  \n• **cameraangle**:{{ $json.output.assets[0].cameraAngle }}\n\n**Headline (Product Name)*{{ $('On form submission').item.json['What is the product\\'s name?'] }}*\n\n  – Font: Avenir Next Heavy (or similar modern geometric sans‑serif)  \n  – Case: UPPERCASE, tightly kerned  \n  – Size:60 pt  \n  – Color: Pure white with a subtle outer glow or neon blue rim light  \n  – Position: Top‑center, 20 px from the top edge  \n\n\n**Subhead (Benefit)*{{ $('On form submission').item.json['Highlighted benefit'] }}*\n“Giảm Giá 50 Triệu”  \n– Font: Be Vietnam Pro Semi‑Bold, 30 pt  \n– Letter‑spacing: 1 px  \n– Color: gradient  \n– Position: Bottom‑center with 20 px padding\n"
+            },
+            {
+              "name": "output_format",
+              "value": "png"
+            },
+            {
+              "parameterType": "formBinaryData",
+              "name": "image",
+              "inputDataFieldName": "image"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -460,
+        420
+      ],
+      "id": "22d9ad42-2da0-49b4-8557-c56af690ef97",
+      "name": "HTTP Request2",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "O8b19lTG6rf0phgW",
+          "name": "Header Auth account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "toBinary",
+        "sourceProperty": "data[0].b64_json",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        -220,
+        420
+      ],
+      "id": "7f23881a-3714-4166-9324-1e5b57b0da7c",
+      "name": "Convert to File2"
+    },
+    {
+      "parameters": {
+        "name": "={{ $('Google Drive').item.json.id }}",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "=",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        40,
+        420
+      ],
+      "id": "5a1be90a-dbe2-44eb-acdf-d3c8f03a4e8c",
+      "name": "Google Drive4",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "5pSKcaFPHWg4krfR",
+          "name": "Google Drive account 2"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Google Drive",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "Convert to File1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File1": {
+      "main": [
+        [
+          {
+            "node": "Google Drive2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File": {
+      "main": [
+        [
+          {
+            "node": "Google Drive3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request2": {
+      "main": [
+        [
+          {
+            "node": "Convert to File2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File2": {
+      "main": [
+        [
+          {
+            "node": "Google Drive4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "6669aaaa-96a2-4856-a7f3-24af733f7605",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "71b4f5b4784db4fe3d06c78f83a033cf435cf636a9d7ae2ee3e7d535bc404960"
+  },
+  "id": "VqxoPOaZpNXFQLlk",
+  "tags": []
+}
