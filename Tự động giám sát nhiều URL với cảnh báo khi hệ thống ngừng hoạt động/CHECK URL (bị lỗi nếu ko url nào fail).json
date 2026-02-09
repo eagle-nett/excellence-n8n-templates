@@ -1,0 +1,477 @@
+{
+  "name": "CHECK URL (bị lỗi nếu ko url nào fail)",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes"
+            }
+          ]
+        }
+      },
+      "id": "99e84cc4-bbe3-4e13-beaa-72fc0ae5c0a7",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "position": [
+        48,
+        320
+      ],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "urls",
+        "options": {}
+      },
+      "id": "4672c53e-1967-4238-83ac-320676291308",
+      "name": "Split Out",
+      "type": "n8n-nodes-base.splitOut",
+      "position": [
+        528,
+        224
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "{\n  \"urls\": {\n    \"URL 2\": \"https://lamhiephung.com\",\n    \"URL 1\": \"https://made4home.com.vn\",\n    \"URL 4\": \"https://github.com\",\n    \"URL 3\": \"https://n8n.io\",\n    \"URL 5\": \"https://made4home.us\",\n    \"URL 6\": \"https://ttppottery.com/\"\n  }\n}",
+        "options": {}
+      },
+      "id": "039d1a37-aa09-4015-8e07-fb8cbafee357",
+      "name": "URLs",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        304,
+        224
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "fieldsToSummarize": {
+          "values": [
+            {
+              "field": "Caida"
+            },
+            {
+              "field": "Funcional"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "5dad62f4-e84b-415c-8694-f74d0735ebc8",
+      "name": "Total",
+      "type": "n8n-nodes-base.summarize",
+      "position": [
+        1008,
+        144
+      ],
+      "typeVersion": 1.1
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "3515db13-389a-470d-8af5-315f7034044d",
+      "name": "Bucle URLs",
+      "type": "n8n-nodes-base.splitInBatches",
+      "position": [
+        752,
+        224
+      ],
+      "typeVersion": 3
+    },
+    {
+      "parameters": {},
+      "id": "93729e1c-0b89-4a44-af7f-f39bc0b41096",
+      "name": "Run trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "position": [
+        48,
+        128
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "sendTo": "tiendatmuxam@gmail.com",
+        "subject": "Webs caídas",
+        "message": "=Te informamos que actualmente estos URLs se encuentran caídos: \n\n{{ $json.url }}\n\n\nCaídos: {{ $('Total').item.json.count_Caida }}\n\nFuncionales: {{ $('Total').item.json.count_Funcional }}",
+        "options": {}
+      },
+      "id": "4e883d2b-8ad9-4f42-bf02-68eeff1c3b0f",
+      "name": "Send a message",
+      "type": "n8n-nodes-base.gmail",
+      "position": [
+        1600,
+        144
+      ],
+      "webhookId": "cf566774-8539-422c-8129-7c9fea6b367c",
+      "typeVersion": 2.1,
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "puklWUt7v4610yfm",
+          "name": "Gmail account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "jsCode": "// 1) Traemos TODOS los ítems que generó el nodo \"Bucle URLs\"\nconst items = $items('Bucle URLs');   // respeta exactamente el nombre del nodo\n\n// 2) Extraemos la propiedad Caida y descartamos vacíos\nconst caidaUrls = items\n  .map(it => it.json.Caida)               \n  .filter(url => typeof url === 'string' && url.trim().length);\n\nif (caidaUrls.length === 0) {\n  throw new Error('No se encontraron URLs en la propiedad \"Caida\".');\n}\n\nreturn caidaUrls.map(url => ({ json: { url } }));\n\n/*  Si prefieres un ÚNICO item con el array completo, comenta la línea anterior\n    y descomenta esto:\nreturn [\n  { json: { caidaUrls } },     // { \"caidaUrls\": [\"https://n8niouou.io\", \"https://n8niopuou.io\"] }\n];\n*/\n"
+      },
+      "id": "dd3cca14-a4a6-4d20-a6b2-e04049f8df24",
+      "name": "Code",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        1200,
+        144
+      ],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "url",
+        "options": {}
+      },
+      "id": "bfa47595-c268-4d36-9b64-1ef6308103f6",
+      "name": "Split Out2",
+      "type": "n8n-nodes-base.splitOut",
+      "position": [
+        1408,
+        144
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.urls }}",
+        "options": {}
+      },
+      "id": "55178c19-268d-4695-875a-335f1a81b13e",
+      "name": "Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        1008,
+        352
+      ],
+      "typeVersion": 4.2,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "content": "### Enter URLs to scan here",
+        "height": 220,
+        "width": 180,
+        "color": 5
+      },
+      "id": "9589043e-5f8b-40a6-bda1-0d62dd22a155",
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        272,
+        160
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "### As a trigger you could also implement webhook or MCP",
+        "height": 480,
+        "width": 180,
+        "color": 5
+      },
+      "id": "ac712d2f-ddeb-4349-b1e7-586d9cf9fce7",
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        0,
+        0
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1SWWHCM2BM0LRKSg7gaMBKIwVizP1PGiwULQpYYaVPa0",
+          "mode": "list",
+          "cachedResultName": "n8n090226",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1SWWHCM2BM0LRKSg7gaMBKIwVizP1PGiwULQpYYaVPa0/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Trang tính1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1SWWHCM2BM0LRKSg7gaMBKIwVizP1PGiwULQpYYaVPa0/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Caida": "=Caida: {{ $json.urls }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Funcional",
+              "displayName": "Funcional",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Caida",
+              "displayName": "Caida",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1200,
+        560
+      ],
+      "id": "a3dc6c48-50cf-4150-87ff-f9cd0c0292a0",
+      "name": "Error",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Lyi84YHyUVNZ6ICA",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1SWWHCM2BM0LRKSg7gaMBKIwVizP1PGiwULQpYYaVPa0",
+          "mode": "list",
+          "cachedResultName": "n8n090226",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1SWWHCM2BM0LRKSg7gaMBKIwVizP1PGiwULQpYYaVPa0/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Trang tính1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1SWWHCM2BM0LRKSg7gaMBKIwVizP1PGiwULQpYYaVPa0/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Funcional": "=Funciona: {{ $('Split Out').item.json.urls }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Funcional",
+              "displayName": "Funcional",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Caida",
+              "displayName": "Caida",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1248,
+        352
+      ],
+      "id": "efb2f508-9127-4985-af45-9f3729ef4a82",
+      "name": "Success",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Lyi84YHyUVNZ6ICA",
+          "name": "Google Sheets account 2"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Split Out2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "URLs": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Total": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Bucle URLs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Bucle URLs": {
+      "main": [
+        [
+          {
+            "node": "Total",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out2": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Run trigger": {
+      "main": [
+        [
+          {
+            "node": "URLs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "URLs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Request": {
+      "main": [
+        [
+          {
+            "node": "Success",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Success": {
+      "main": [
+        [
+          {
+            "node": "Bucle URLs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Error": {
+      "main": [
+        [
+          {
+            "node": "Bucle URLs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "61a748fc-e300-42f0-abd4-97ec76bf4cc6",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "cee8b9aaf4783045b48096be9cb06680694d6dcd09cb8a953489a482a1ae8d00"
+  },
+  "id": "ZFdRoyEzs4xUn38K9bPof",
+  "tags": []
+}
