@@ -1,0 +1,23 @@
+Quy trình n8n này cho phép bạn tự động giám sát trạng thái của nhiều URL một cách đơn giản và hiệu quả. Bạn chỉ cần nhập các URL muốn quét và chạy quy trình (thủ công hoặc theo lịch). Đối với mỗi URL, hệ thống sẽ thực hiện kiểm tra tính khả dụng. Kết quả được ghi lại trong Google Sheet, phân biệt rõ ràng giữa các lần kiểm tra thành công và thất bại (thời gian ngừng hoạt động). Nếu bất kỳ URL nào gặp lỗi, hệ thống sẽ lọc các lỗi này và tự động gửi email cảnh báo thông báo cho bạn về các sự cố được phát hiện.
+
+Quy trình bao gồm các thông báo trợ giúp bằng cả tiếng Anh và tiếng Tây Ban Nha, tích hợp với Google Sheets và Gmail, và phù hợp cho cả các tác vụ một lần và giám sát theo lịch trình.
+
+Dành cho ai?
+
+Quản trị viên web
+Nhóm SEO & Marketing
+Quản trị viên hệ thống
+Bất kỳ ai cần giám sát thời gian hoạt động của trang web tự động
+Cách hoạt động?
+
+Nhập các URL cần quét vào trường “URL”.
+
+Kích hoạt quy trình thủ công hoặc lên lịch chạy tự động.
+
+Đối với mỗi URL, quy trình sẽ:
+
+Kiểm tra xem URL có trực tuyến hay không.
+
+Ghi lại trạng thái (thành công hoặc lỗi) trong Google Sheet. Cuối cùng, hệ thống sẽ lọc các URL bị lỗi (gây sập) và gửi cảnh báo qua email.
+
+https://n8n.io/workflows/5298-automatic-monitoring-of-multiple-urls-with-downtime-alerts/
